@@ -1,26 +1,32 @@
 package Helpers;
 
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
+import java.net.MalformedURLException;
 import java.util.concurrent.TimeUnit;
 
 public class DriverHelper {
 
-    private static WebDriver driver;
+    private static RemoteWebDriver driver;
 
-    public synchronized static WebDriver getCurrentDriver() {
+    public synchronized static RemoteWebDriver getCurrentDriver() {
         if (driver != null) return driver;
         try {
             System.setProperty("webdriver.chrome.driver", "ChromeDriver.exe");
-            driver = new ChromeDriver();
-            driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
-            return driver;
 
+            driver = new RemoteWebDriver(new java.net.URL("http://localhost:4723/wd/hub"), DesiredCapabilities.android());
+
+            driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
         } finally {
             Runtime.getRuntime().addShutdownHook(
                     new Thread(new BrowserClose()));
         }
+        return driver;
     }
 
     public static void close() {
